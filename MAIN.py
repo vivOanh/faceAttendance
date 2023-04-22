@@ -1,3 +1,6 @@
+import os
+
+import cv2
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow
 import sys
@@ -83,6 +86,7 @@ class MAIN:
         self.uiManageStudent.setupUi(self.winManageStudent)
         self.uiManageStudent.InsertDataInTableWidget(self.uiManageStudent.tableWidget)
         self.winManageStudent.show()
+        self.main_ad_win.hide()
 
         self.uiManageStudent.btnThem.clicked.connect(self.AddStudent)
         self.uiManageStudent.btnSua.clicked.connect(self.EditStudent)
@@ -141,6 +145,17 @@ class MAIN:
             conn.commit()
             conn.close()
 
+            fileNameImage = f"sv{maSV}.png"
+            fpath = os.getcwd()
+            path = os.path.join(fpath, 'images')
+            os.chdir(path)
+
+            image = cv2.imread(self.uiEditStudent.fname)
+            # print(self.uiEditStudent.pathImages)
+            cv2.imwrite(fileNameImage, image)
+            # print(path, fileNameImage)
+            os.chdir(fpath)
+
             self.uiManageStudent.InsertDataInTableWidget(self.uiManageStudent.tableWidget)
             self.winManageStudent.show()
             self.winEditStudent.hide()
@@ -156,7 +171,8 @@ class MAIN:
         self.uiAddStudent.btnThem.clicked.connect(self.CheckDataInputAddStudent)
     def CheckDataInputAddStudent(self):
         maSV, hoDem, ten, ngaySinh, gioiTinh, nganhHoc, lop = self.uiAddStudent.GetDataInput()
-        if maSV == "" or hoDem == "" or ten == "" or ngaySinh == "" or nganhHoc == "" or lop== "" :
+        if maSV == "" or hoDem == "" or ten == "" or ngaySinh == "" \
+                or nganhHoc == "" or lop== "" or self.uiAddStudent.fname == "":
             self.ui_notifi_error = UI_Notifi_Error.Ui_MainWindow()
             self.ui_notifi_error.setupUi(self.ui_notifi_error.MainWindow)
             self.ui_notifi_error.MainWindow.show()
@@ -164,10 +180,20 @@ class MAIN:
             sqlCheckStudentAlreadyExist = "SELECT maSV FROM Sinhviens  WHERE maSV = '"+maSV+"';"
             conn = sqlite3.connect('data.db')
             if not len(conn.execute(sqlCheckStudentAlreadyExist).fetchall()):
+                fileNameImage = f"sv{maSV}.png"
+
                 sqlAddStudent = " INSERT INTO Sinhviens(maSV, hoDem, ten, ngaySinh, gioiTinh, nganhHoc, lop, url_anh )" \
-                                " VALUES('"+maSV+"','"+hoDem+"','"+ten+"','"+ngaySinh+"','"+gioiTinh+"','"+nganhHoc+"','"+lop+"','sv"+maSV+".png');"
+                                " VALUES('"+maSV+"','"+hoDem+"','"+ten+"','"+ngaySinh+"','"+gioiTinh+"','"+nganhHoc+"','"+lop+"','"+fileNameImage+"');"
                 conn.execute(sqlAddStudent)
                 conn.commit()
+
+                fpath = os.getcwd()
+                path = os.path.join(fpath, 'images')
+                os.chdir(path)
+
+                image = cv2.imread(self.uiAddStudent.fname)
+                cv2.imwrite(fileNameImage, image)
+                os.chdir(fpath)
 
                 self.winAddStudentSuccessful = QMainWindow()
                 self.uiAddStudentSuccessful = UI_Notifi_add_success.Ui_MainWindow()

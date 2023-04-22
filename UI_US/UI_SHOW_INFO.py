@@ -14,7 +14,6 @@ class Ui_MainWindow(object):
         self.maLHP = ma_lhp
         self.teacher_name = teacher_name
         self.subject_name = subject_name
-        self.ngayHoc = "15/3"
 
         self.conn = sqlite3.connect("data.db")
         self.list_lable = ['Mã sinh viên', 'Họ đệm', 'Tên']
@@ -29,7 +28,7 @@ class Ui_MainWindow(object):
         for item in cursor_day:
             self.list_day.append(item[0])
             self.list_lable.append(item[0])
-        self.list_lable.append("Tổng số tiết nghỉ")
+        self.list_lable.append("Số tiết nghỉ")
         labelsInDF = self.list_day
         # labelsInDF.append("Tổng số tiết nghỉ")
         # print(self.list_lable)
@@ -45,6 +44,10 @@ class Ui_MainWindow(object):
         for item in labelsInDF:
             self.df[item] = None
 
+        sql_tiet_hoc = "SELECT tietHoc FROM Thoikhoabieu_Lophocphans WHERE maLHP = '" + self.maLHP + "';"
+        tiet_hoc = self.conn.execute(sql_tiet_hoc).fetchone()[0]
+        so_tiet_1_buoi = len(tiet_hoc.split(","))
+
     #   Đánh số đi học
         for number_index, index in enumerate(self.df.index):
             for number_columns, columns in enumerate(self.df.columns):
@@ -52,9 +55,9 @@ class Ui_MainWindow(object):
                         " AND maSV = '" + index + "' AND ngayHoc = '" + columns + "' AND diemdanh = 'x';"
                 idAndDate = self.conn.execute(sql_check_attendance)
                 # print(idAndDate.fetchone())
-                if idAndDate.fetchone():
+                if not idAndDate.fetchone() and columns in labelsInDF:
                     # print(index, columns)
-                    self.df.loc[index, columns] = 'x'
+                    self.df.loc[index, columns] = str(so_tiet_1_buoi)+'k'
         # print(self.df)
 
         # print(self.list_day[-1])
@@ -62,14 +65,16 @@ class Ui_MainWindow(object):
         # month = int(self.list_day[-1].split("/")[1])
         # print(day, month)
 
-        sql_tiet_hoc = "SELECT tietHoc FROM Thoikhoabieu_Lophocphans WHERE maLHP = '" + self.maLHP + "';"
+
 
         if len(self.conn.execute(sql_tiet_hoc).fetchall()):
-            tiet_hoc = self.conn.execute(sql_tiet_hoc).fetchone()[0]
-            so_tiet_1_buoi = len(tiet_hoc.split(","))
+
             list_stn = []
             for index in self.df.index:
-                so_buoi_nghi = self.df.loc[index].isna().sum()
+                so_buoi_nghi = 0
+                for data_col in labelsInDF:
+                    if self.df.loc[index, data_col] != None:
+                        so_buoi_nghi += 1
                 list_stn.append(str(so_tiet_1_buoi * so_buoi_nghi))
             self.df["Tổng số tiết nghỉ"] = list_stn
 

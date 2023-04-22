@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+import os
 
+import cv2
 # Form implementation generated from reading ui file 'uiAddStudent.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
@@ -12,6 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_MainWindow(object):
+    fname = ""
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1000, 550)
@@ -85,6 +88,19 @@ class Ui_MainWindow(object):
         self.btnThem = QtWidgets.QPushButton(self.centralwidget)
         self.btnThem.setGeometry(QtCore.QRect(370, 430, 211, 51))
         self.btnThem.setObjectName("btnThem")
+
+        self.lb_images = QtWidgets.QLabel(self.centralwidget)
+        self.lb_images.setGeometry(QtCore.QRect(700, 300, 150, 150))
+        self.lb_images.setFrameShape(QtWidgets.QFrame.Box)
+        self.lb_images.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.lb_images.setText("")
+        self.lb_images.setAlignment(QtCore.Qt.AlignCenter)
+        self.lb_images.setObjectName("lb_images")
+        self.btnSelectFile = QtWidgets.QPushButton(self.centralwidget)
+        self.btnSelectFile.setGeometry(QtCore.QRect(700, 450, 101, 41))
+        self.btnSelectFile.setObjectName("btnSelectFile")
+        self.btnSelectFile.setText("chọn ảnh")
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1000, 21))
@@ -95,10 +111,15 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         # self.btnThem.clicked.connect(self.GetDataInput)
+        self.btnSelectFile.clicked.connect(self.putImage)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+    def putImage(self):
+        self.fname = QtWidgets.QFileDialog.getOpenFileName(filter='(*.png);;(*.jpg)')[0]
+        self.pixmap = QtGui.QPixmap(self.fname)
+        self.lb_images.setPixmap(self.pixmap)
     def GetDataInput(self):
         maSV = self.ip_maSV.text()
         hoDem = self.ipHoDem.text()

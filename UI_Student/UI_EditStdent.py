@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 
 # Form implementation generated from reading ui file 'uiEditStudent.ui'
 #
@@ -97,6 +98,19 @@ class Ui_MainWindow(object):
         self.btnSua = QtWidgets.QPushButton(self.centralwidget)
         self.btnSua.setGeometry(QtCore.QRect(370, 430, 211, 51))
         self.btnSua.setObjectName("btnSua")
+
+        self.lb_images = QtWidgets.QLabel(self.centralwidget)
+        self.lb_images.setGeometry(QtCore.QRect(700, 300, 150, 150))
+        self.lb_images.setFrameShape(QtWidgets.QFrame.Box)
+        self.lb_images.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.lb_images.setText("")
+        self.lb_images.setAlignment(QtCore.Qt.AlignCenter)
+        self.lb_images.setObjectName("lb_images")
+        self.btnSelectFile = QtWidgets.QPushButton(self.centralwidget)
+        self.btnSelectFile.setGeometry(QtCore.QRect(700, 450, 101, 41))
+        self.btnSelectFile.setObjectName("btnSelectFile")
+        self.btnSelectFile.setText("chọn ảnh")
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1000, 21))
@@ -118,7 +132,13 @@ class Ui_MainWindow(object):
         self.ipNganhHoc.setText(self.result[5])
         self.ipLop.setText(self.result[6])
 
-        self.btnSua.clicked.connect(self.GetDataInput)
+        fname = os.getcwd()
+        self.pathImages = os.path.join(fname, 'images', self.result[7])
+        self.pixmap = QtGui.QPixmap(self.pathImages)
+        self.lb_images.setPixmap(self.pixmap)
+
+        # self.btnSua.clicked.connect(self.GetDataInput)
+        self.btnSelectFile.clicked.connect(self.putImage)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -133,6 +153,14 @@ class Ui_MainWindow(object):
         lop = self.ipLop.text()
         # print(maSV, hoDem, ten, ngaySinh, gioiTinh, nganhHoc, lop)
         return maSV, hoDem, ten, ngaySinh, gioiTinh, nganhHoc, lop
+
+    def putImage(self):
+        self.fname = QtWidgets.QFileDialog.getOpenFileName(filter='(*.png);;(*.jpg)')[0]
+        self.pixmap = QtGui.QPixmap(self.fname)
+        self.lb_images.setPixmap(self.pixmap)
+
+    def updateImage(self):
+        pass
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
