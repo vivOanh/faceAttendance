@@ -1,58 +1,59 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
 import cv2
 import os
+import sqlite3
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 600)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
-        self.lb_images = QtWidgets.QLabel(self.centralwidget)
-        self.lb_images.setGeometry(QtCore.QRect(230, 100, 100, 100))
-        self.lb_images.setFrameShape(QtWidgets.QFrame.Box)
-        self.lb_images.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.lb_images.setText("")
-        self.lb_images.setAlignment(QtCore.Qt.AlignCenter)
-        self.lb_images.setObjectName("lb_images")
-        self.btnSelectFile = QtWidgets.QPushButton(self.centralwidget)
-        self.btnSelectFile.setGeometry(QtCore.QRect(230, 240, 101, 41))
-        self.btnSelectFile.setObjectName("btnSelectFile")
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
-        self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
 
-        self.btnSelectFile.clicked.connect(self.putImage)
+def ResizeImages():
+    path = os.getcwd()
+    path = os.path.join(path, 'images')
+    os.chdir(path)
+    for label in os.listdir():
+        print(label)
+        image = cv2.imread(os.path.join(path, label))
+        new_image = cv2.resize(image, (150, 150))
+        cv2.imwrite(label, new_image)
+    print(f"Done!")
 
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+ResizeImages()
 
-    def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.btnSelectFile.setText(_translate("MainWindow", "chon file"))
+def InsertTableDiemDanh(maLHP):
+    conn = sqlite3.connect('data.db')
+    querySelect = f"SELECT maSV, ngayHoc FROM Lophocphan_Sinhviens INNER JOIN Thoikhoabieu_Lophocphans ON " \
+                  f"Lophocphan_Sinhviens.maLHP = Thoikhoabieu_Lophocphans.maLHP WHERE Lophocphan_Sinhviens.maLHP = '{maLHP}';"
+    result = conn.execute(querySelect).fetchall()
+    for data in result:
+        maSV = data[0]
+        ngayHoc = data[1]
+        queryInsertDiemdanh = f"INSERT INTO Diemdanhs(maLHP, maSV, ngayHoc, diemdanh) VALUES('{maLHP}','{maSV}','{ngayHoc}','x');"
+        conn.execute(queryInsertDiemdanh)
+        conn.commit()
 
-    def putImage(self):
-        fname = QtWidgets.QFileDialog.getOpenFileName(filter='(*.png);;(*.jpg)')
-        self.pixmap = QtGui.QPixmap(fname[0])
-        self.lb_images.setPixmap(self.pixmap)
-        fpath = os.getcwd()
-        path = os.path.join(fpath, 'indata')
-        os.chdir(path)
-        image = cv2.imread(fname[0])
-        cv2.imwrite('demo.png', image)
-        os.chdir(fpath)
+    conn.close()
+    print("Done!")
+# InsertTableDiemDanh("202110503190006")
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+"""
+Vi Văn Oanh
+201920503127005
+
+202010503130010
+202010503130011
+20221IT6021007
+----------------
+201920503127001
+201920503127002
+20221IT6021005
+201920503127008
+-----------------
+201920503127004
+201920503127003
+20221IT6021006
+-----------------
+202010503130012
+202110503190005
+202110503190006
+-----------------
+201920503127008
+
+
+"""

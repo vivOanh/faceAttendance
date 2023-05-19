@@ -131,8 +131,9 @@ class MAIN:
         self.uiEditStudent.btnSua.clicked.connect(self.CheckDataInputEditStudent)
 
     def CheckDataInputEditStudent(self):
+        img_path = self.uiEditStudent.getPathImage()
         maSV, hoDem, ten, ngaySinh, gioiTinh, nganhHoc, lop = self.uiEditStudent.GetDataInput()
-        if hoDem == "" or ten == "" or ngaySinh == "" or nganhHoc == "" or lop == "":
+        if hoDem == "" or ten == "" or ngaySinh == "" or nganhHoc == "" or lop == "" or img_path == "":
             self.ui_notifi_error = UI_Notifi_Error.Ui_MainWindow()
             self.ui_notifi_error.setupUi(self.ui_notifi_error.MainWindow)
             self.ui_notifi_error.MainWindow.show()
@@ -148,12 +149,11 @@ class MAIN:
             fileNameImage = f"sv{maSV}.png"
             fpath = os.getcwd()
             path = os.path.join(fpath, 'images')
-            os.chdir(path)
 
-            image = cv2.imread(self.uiEditStudent.fname)
-            # print(self.uiEditStudent.pathImages)
+            image = cv2.imread(img_path)
+
+            os.chdir(path)
             cv2.imwrite(fileNameImage, image)
-            # print(path, fileNameImage)
             os.chdir(fpath)
 
             self.uiManageStudent.InsertDataInTableWidget(self.uiManageStudent.tableWidget)
@@ -756,9 +756,6 @@ class MAIN:
     def out_quanlytk(self):
         self.account_win.hide()
         self.main_ad_win.show()
-
-
-
 
 #   UI US
     def log_data(self):

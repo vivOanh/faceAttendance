@@ -133,8 +133,8 @@ class Ui_MainWindow(object):
         self.ipLop.setText(self.result[6])
 
         fname = os.getcwd()
-        self.pathImages = os.path.join(fname, 'images', self.result[7])
-        self.pixmap = QtGui.QPixmap(self.pathImages)
+        self.imagePath = os.path.join(fname, 'images', self.result[7])
+        self.pixmap = QtGui.QPixmap(self.imagePath)
         self.lb_images.setPixmap(self.pixmap)
 
         # self.btnSua.clicked.connect(self.GetDataInput)
@@ -155,12 +155,12 @@ class Ui_MainWindow(object):
         return maSV, hoDem, ten, ngaySinh, gioiTinh, nganhHoc, lop
 
     def putImage(self):
-        self.fname = QtWidgets.QFileDialog.getOpenFileName(filter='(*.png);;(*.jpg)')[0]
-        self.pixmap = QtGui.QPixmap(self.fname)
+        self.imagePath = QtWidgets.QFileDialog.getOpenFileName(filter='(*.png);;(*.jpg)')[0]
+        self.pixmap = QtGui.QPixmap(self.imagePath)
         self.lb_images.setPixmap(self.pixmap)
 
-    def updateImage(self):
-        pass
+    def getPathImage(self):
+        return self.imagePath
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

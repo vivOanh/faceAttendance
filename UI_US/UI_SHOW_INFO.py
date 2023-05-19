@@ -5,6 +5,8 @@ import sys
 import pandas as pd
 import time
 
+from PyQt5.QtWidgets import QFileDialog
+
 
 class Ui_MainWindow(object):
     def __init__(self, ma_lhp, teacher_name, subject_name):
@@ -38,8 +40,6 @@ class Ui_MainWindow(object):
         self.col = len(self.list_lable)
         self.row = len(cursor_numRow.fetchall())
 
-        # sql_check_attendance = "SELECT maSV, ngayHoc FROM Diemdanhs WHERE maLHP = '"+str(self.maLHP)+"'  AND maSV = '"+self.maSV+"' AND ngayHoc = '"+self.ngayHoc+"' AND diemdanh = 'x';"
-
         self.df = pd.read_sql(sql_select_sinhviens, self.conn, index_col='maSV')
         for item in labelsInDF:
             self.df[item] = None
@@ -58,14 +58,6 @@ class Ui_MainWindow(object):
                 if not idAndDate.fetchone() and columns in labelsInDF:
                     # print(index, columns)
                     self.df.loc[index, columns] = str(so_tiet_1_buoi)+'k'
-        # print(self.df)
-
-        # print(self.list_day[-1])
-        # day = int(self.list_day[-1].split("/")[0])
-        # month = int(self.list_day[-1].split("/")[1])
-        # print(day, month)
-
-
 
         if len(self.conn.execute(sql_tiet_hoc).fetchall()):
 
@@ -111,6 +103,11 @@ class Ui_MainWindow(object):
         self.label_tenhocphan = QtWidgets.QLabel(self.centralwidget)
         self.label_tenhocphan.setGeometry(QtCore.QRect(20, 70, 400, 30))
         self.label_tenhocphan.setObjectName("label_tenhocphan")
+
+        self.btn_exportFile = QtWidgets.QPushButton(self.centralwidget)
+        self.btn_exportFile.setGeometry(QtCore.QRect(800, 75, 160, 40))
+        self.btn_exportFile.setObjectName("btn_exportFile")
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 27))
@@ -122,47 +119,48 @@ class Ui_MainWindow(object):
 
         self.ShowDataFrame(self.tableWidget)
 
+        self.btn_exportFile.clicked.connect(self.ExportFile)
+
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-    # def tinh_tong_tiet_nghi(self):
-    #     self.conn = sqlite3.connect('data.db')
-    #     sql_tiet_hoc = "SELECT tietHoc FROM Thoikhoabieu_Lophocphans WHERE maLHP = '"+self.maLHP+"';"
-    #     tiet_hoc = self.conn.execute(sql_tiet_hoc).fetchone()[0]
-    #     so_tiet_1_buoi = len(tiet_hoc.split(","))
-    #     list_stn = []
-    #     for index in self.df.index:
-    #         so_buoi_nghi = self.df.loc[index].isna().sum()
-    #         list_stn.append(so_tiet_1_buoi * so_buoi_nghi)
-    #     self.df["Tổng số tiết nghỉ"] = list_stn
-    #     self.ShowDataFrame(self.tableWidget)
-    #     self.conn.close()
-    #     print(list_stn)
+    def ExportFile(self):
+        import os
+        fpath = os.getcwd()
+        path = os.path.join(fpath, 'File_Export')
+        os.chdir(path)
+        fileName = f"{self.subject_name}_{self.maLHP}.xlsx"
+        self.df = self.df.rename(columns={'maSV': 'Mã sinh viên'})
+        self.df = self.df.rename(columns={'hoDem': 'Họ đệm'})
+        self.df = self.df.rename(columns={'ten': 'Tên'})
+
+        self.df.to_excel(fileName)
+        os.chdir(fpath)
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Thông tin điểm danh"))
         self.label_giaoviengiangday.setText(_translate("MainWindow", "Giáo viên giảnh dạy: "+self.teacher_name))
         self.label_malophocphan.setText(_translate("MainWindow", "Mã lớp học phần: "+self.maLHP))
         self.label_tenhocphan.setText(_translate("MainWindow", "Tên học phần: "+self.subject_name))
+        self.btn_exportFile.setText(_translate("MainWindow", "Xuất file Excel"))
 
     def ShowDataFrame(self, tableWidget):
         for number_index, index in enumerate(self.df.index):
             # print(number_index, index)
             data = QtWidgets.QTableWidgetItem(index)
             data.setTextAlignment(Qt.AlignCenter)
-            tableWidget.setItem(number_index,0, data)
+            tableWidget.setItem(number_index, 0, data)
             for number_columns, columns in enumerate(self.df.columns):
                 # print(number_columns, self.df.loc[index, columns])
                 data = QtWidgets.QTableWidgetItem(self.df.loc[index, columns])
-                data.setTextAlignment(Qt.AlignCenter)
+                # data.setTextAlignment(Qt.AlignCenter)
                 tableWidget.setItem(number_index, number_columns+1, data)
-
-
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     main_window = QtWidgets.QMainWindow()
-    UI = Ui_MainWindow('202110503190006', 'Vi Văn Oanh', 'Trí Tuệ Nhân Tạo')
+    UI = Ui_MainWindow('201920503127005', 'Vi Văn Oanh', 'Trí Tuệ Nhân Tạo')
     UI.setupUi(main_window)
     main_window.show()
     sys.exit(app.exec_())

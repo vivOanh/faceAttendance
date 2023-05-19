@@ -28,8 +28,10 @@ class Ui_MainWindow(object):
 
         sqlSelectStudentInClass = "SELECT Sinhviens.maSV, hoDem, ten FROM Sinhviens INNER JOIN Lophocphan_Sinhviens " \
                                   "ON Sinhviens.maSV = Lophocphan_Sinhviens.maSV WHERE maLHP = '" + self.idSubjectClass + "';"
-        sqlSelectStudentNotInClass = "SELECT DISTINCT Sinhviens.maSV, hoDem, ten FROM Sinhviens INNER JOIN Lophocphan_Sinhviens " \
-                                     "ON Sinhviens.maSV = Lophocphan_Sinhviens.maSV WHERE NOT maLHP = '" + self.idSubjectClass + "';"
+
+        sqlSelectStudentNotInClass = f"SELECT DISTINCT maSV, hoDem, ten FROM Sinhviens;"
+        # sqlSelectStudentNotInClass = "SELECT DISTINCT Sinhviens.maSV, hoDem, ten FROM Sinhviens INNER JOIN Lophocphan_Sinhviens " \
+        #                              "ON Sinhviens.maSV = Lophocphan_Sinhviens.maSV WHERE NOT maLHP = '" + self.idSubjectClass + "';"
 
         resultStudentInClass = conn.execute(sqlSelectStudentInClass).fetchall()
         resultStudentNotInClass = conn.execute(sqlSelectStudentNotInClass).fetchall()

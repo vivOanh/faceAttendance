@@ -33,6 +33,7 @@ class SimpleFacerec:
             img = cv2.imread(img_path)
             rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             # Get encoding
+            # print(face_recognition.face_encodings(rgb_img))
             img_encoding = face_recognition.face_encodings(rgb_img)[0]
             # Store file name and file encoding
             self.known_face_encodings.append(img_encoding)
